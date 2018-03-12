@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Movie App</string>
+    <string name="app_name">Popular Movies</string>
 
     <!-- TODO You need to put your api key from https://www.themoviedb.org here to run this-->
 
