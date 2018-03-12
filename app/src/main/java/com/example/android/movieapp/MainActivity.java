@@ -41,6 +41,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
     private static boolean PREFERENCES_HAVE_BEEN_UPDATED = false;
     private static final int MOVIE_LOADER_ID = 0;
 
+    public static final String FAVORITE_PATH="favorites";
+
     public  static final String[] MAIN_MOVIE_PROJECTION={
             MovieEntry.COLUMN_MOVIE_POSTER_URL,
             MovieEntry.COLUMN_MOVIE_ID,
@@ -95,56 +97,64 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle loaderArgs) {
+        SharedPreferences sharedPreferences = PreferenceManager.
+                getDefaultSharedPreferences(MainActivity.this);
+        String orderValue = sharedPreferences.getString(getString(R.string.pref_order_key),
+                getString(R.string.pref_popular_value));
 
-        AsyncTask<Void, Void, Void> mFetchMovieTask;
+        Log.i(LOG_TAG, "orderValue!!!!!!!!!!!!!!!!!! "+orderValue);
 
-        mFetchMovieTask = new AsyncTask<Void, Void, Void>() {
-            ContentValues[] mMoviesValues;
+        if (orderValue.equals("popular")||orderValue.equals("top_rated")) {
 
-            @Override
-            protected Void doInBackground(Void... voids) {
-                try {
+            AsyncTask<Void, Void, Void> mFetchMovieTask;
 
-                    SharedPreferences sharedPreferences = PreferenceManager.
-                            getDefaultSharedPreferences(MainActivity.this);
-                    String orderValue = sharedPreferences.getString(getString(R.string.pref_order_key),
-                            getString(R.string.pref_popular_value));
-                    URL moviesRequestUrl = NetworkUtilities.buildUrl(orderValue);
+            mFetchMovieTask = new AsyncTask<Void, Void, Void>() {
+                ContentValues[] mMoviesValues;
 
-                    String jsonMoviesResponse = NetworkUtilities.getResponseFromHttpUrl(moviesRequestUrl);
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    try {
 
-
-
-                    mMoviesValues = MoviesJsonUtils
-                            .getSimpleMovieContentValuesFromJson(getApplicationContext(), jsonMoviesResponse);
-
-                    if (mMoviesValues != null && mMoviesValues.length != 0) {
-                        ContentResolver movieContentResolver = getApplicationContext().getContentResolver();
+                        SharedPreferences sharedPreferencesInAssync = PreferenceManager.
+                                getDefaultSharedPreferences(MainActivity.this);
+                        String orderValueInAssync = sharedPreferencesInAssync.getString(getString(R.string.pref_order_key),
+                                getString(R.string.pref_popular_value));
 
 
+                        URL moviesRequestUrl = NetworkUtilities.buildUrl(orderValueInAssync);
 
-                        movieContentResolver.delete(
-                                MovieEntry.CONTENT_URI,
-                                null,
-                                null);
-                        Log.i(LOG_TAG, "bulk INSERTASSSSS");
+                        String jsonMoviesResponse = NetworkUtilities.getResponseFromHttpUrl(moviesRequestUrl);
 
-                        movieContentResolver.bulkInsert(
-                                MovieEntry.CONTENT_URI,
-                                mMoviesValues);
 
+                        mMoviesValues = MoviesJsonUtils
+                                .getSimpleMovieContentValuesFromJson(getApplicationContext(), jsonMoviesResponse);
+
+                        if (mMoviesValues != null && mMoviesValues.length != 0) {
+                            ContentResolver movieContentResolver = getApplicationContext().getContentResolver();
+
+
+                            movieContentResolver.delete(
+                                    MovieEntry.CONTENT_URI,
+                                    null,
+                                    null);
+                            Log.i(LOG_TAG, "bulk INSERTASSSSS");
+
+                            movieContentResolver.bulkInsert(
+                                    MovieEntry.CONTENT_URI,
+                                    mMoviesValues);
+
+                        }
+
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-
-
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    return null;
                 }
-                return null;
-            }
 
-        };
+            };
 
-        mFetchMovieTask.execute();
+            mFetchMovieTask.execute();
 
 //        return new AsyncTaskLoader<String[]>(this) {
 //            String[] mMovieData = null;
@@ -235,17 +245,38 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
 //        };
 //    }
 
-        switch (id){
-            case MOVIE_LOADER_ID:
-                Uri movieQueryUri = MovieEntry.CONTENT_URI;
-                return new CursorLoader(this,
-                        movieQueryUri,
-                        MAIN_MOVIE_PROJECTION,
-                        null,
-                        null,
-                        null);
+            switch (id) {
+                case MOVIE_LOADER_ID:
+                    Uri movieQueryUri = MovieEntry.CONTENT_URI;
+                    return new CursorLoader(this,
+                            movieQueryUri,
+                            MAIN_MOVIE_PROJECTION,
+                            null,
+                            null,
+                            null);
                 default:
                     throw new RuntimeException("Loader Not Implemented: " + id);
+            }
+        }else
+        {
+
+            switch (id) {
+                case MOVIE_LOADER_ID:
+                    Uri favoriteMovieQueryUri = MovieEntry.CONTENT_URI;
+                    Uri favoriteQuerry=favoriteMovieQueryUri.buildUpon().appendPath(FAVORITE_PATH).build();
+
+
+                    Log.i(LOG_TAG, "LINKAS !!!!!!!!! "+favoriteQuerry);
+                    return new CursorLoader(this,
+                            favoriteQuerry,
+                            MAIN_MOVIE_PROJECTION,
+                            null,
+                            null,
+                            null);
+                default:
+                    throw new RuntimeException("Loader Not Implemented: " + id);
+            }
+
         }
     }
 

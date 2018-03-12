@@ -20,6 +20,7 @@ public class MovieProvider extends ContentProvider{
 
     public static final int CODE_ALL_MOVIES=100;
     public static final int CODE_ONE_MOVIE=101;
+    public static final int CODE_FAVORITE_MOVIES=200;
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private MovieDbHelper mOpenHelper;
@@ -31,6 +32,8 @@ public class MovieProvider extends ContentProvider{
         matcher.addURI(authority, MovieContract.PATH_MOVIE, CODE_ALL_MOVIES);
 
         matcher.addURI(authority, MovieContract.PATH_MOVIE+"/#", CODE_ONE_MOVIE);
+
+        matcher.addURI(authority, MovieContract.PATH_MOVIE+"/favorites", CODE_FAVORITE_MOVIES);
 
         return matcher;
     }
@@ -79,6 +82,17 @@ public class MovieProvider extends ContentProvider{
                         null,
                         sortOrder);
 
+                break;
+            }
+
+            case CODE_FAVORITE_MOVIES:{
+                retCursor = db.query(MovieEntry.TABLE_NAME_FAVORITES,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
                 break;
             }
             default:
