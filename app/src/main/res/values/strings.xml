@@ -6,7 +6,7 @@
     <string name="api_key_movies"></string>
 
     <string name="pref_order_key" translatable="false">order</string>
-    <string name="pref_order_label" translatable="false">Order By :</string>
+    <string name="pref_order_label" translatable="false">Show :</string>
 
 
     <string name="pref_popular_label">Popular</string>
@@ -14,6 +14,9 @@
 
     <string name="pref_top_label">Top Rated</string>
     <string name="pref_top_value" translatable="false">top_rated</string>
+
+    <string name="pref_favorite_label">Favorite</string>
+    <string name="pref_favorite_value" translatable="false">favorite</string>
 
     <string name="content_authority">com.example.android.movieapp</string>
 </resources>

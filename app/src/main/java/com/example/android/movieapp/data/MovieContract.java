@@ -21,6 +21,8 @@ public class MovieContract {
                 .appendPath(PATH_MOVIE)
                 .build();
 
+        public static final String TABLE_NAME_FAVORITES="FavoriteMovie";
+
         public static final String TABLE_NAME="movie";
 
         public static final String COLUMN_MOVIE_ID="id";
@@ -38,6 +40,7 @@ public class MovieContract {
         public static final String COLUMN_MOVIE_TRAILER_URL="trailer";
 
         public static final String COLUMN_MOVIE_REVIEW_STRING="review";
+
 
         public static Uri buildMovieUriWithId(int id) {
             return CONTENT_URI.buildUpon()

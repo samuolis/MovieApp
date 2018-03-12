@@ -1,6 +1,7 @@
 package com.example.android.movieapp.data;
 
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
@@ -128,30 +129,22 @@ public class MovieProvider extends ContentProvider{
                 return super.bulkInsert(uri, values);
         }
     }
-
+    //using only for favorites, so no switch statement
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
-//
-//        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-//        int match = sUriMatcher.match(uri);
-//        Uri returnUri;
-//
-//        switch (match) {
-//            case CODE_ONE_MOVIE:
-//                long id = db.insert(MovieEntry.TABLE_NAME, null, values);
-//                if ( id > 0 ) {
-//                    returnUri = ContentUris.withAppendedId(MovieEntry.CONTENT_URI, id);
-//                } else {
-//                    throw new android.database.SQLException("Failed to insert row into " + uri);
-//                }
-//                break;
-//            default:
-//                throw new UnsupportedOperationException("Unknown uri: " + uri);
-//        }
-//        getContext().getContentResolver().notifyChange(uri, null);
-//        return returnUri;
-        return null;
+
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        Uri returnUri;
+
+        long id = db.insert(MovieEntry.TABLE_NAME_FAVORITES, null, values);
+        if ( id > 0 ) {
+            returnUri = ContentUris.withAppendedId(MovieEntry.CONTENT_URI, id);
+        } else {
+            throw new android.database.SQLException("Failed to insert row into " + uri);
+        }
+        getContext().getContentResolver().notifyChange(uri, null);
+        return returnUri;
     }
 
     @Override
