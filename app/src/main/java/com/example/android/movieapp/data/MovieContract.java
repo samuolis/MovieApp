@@ -21,6 +21,7 @@ public class MovieContract {
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon()
                 .appendPath(PATH_MOVIE)
                 .build();
+        public static final String PATH_FAVORITES_FINAL=PATH_MOVIE+"/"+FAVORITE_PATH;
 
         public static final String TABLE_NAME_FAVORITES="FavoriteMovie";
 
@@ -45,6 +46,12 @@ public class MovieContract {
 
         public static Uri buildMovieUriWithId(int id) {
             return CONTENT_URI.buildUpon()
+                    .appendPath(Integer.toString(id))
+                    .build();
+        }
+        public static Uri buildMovieUriWithIdForFavorites(int id) {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(FAVORITE_PATH)
                     .appendPath(Integer.toString(id))
                     .build();
         }

@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -12,9 +13,13 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -40,6 +45,14 @@ public class DetailActivity extends AppCompatActivity implements
     private ImageView mMoviefavoriteStar;
     public static final String LOG_TAG = DetailActivity.class.getSimpleName();
     public static Boolean asyncDone;
+    private String youtubeTrailerSOURCE;
+    private RecyclerView mDetailRecyclerView;
+    private DetailAdapter mDetailAdapter;
+    private String moviePosterUrl;
+    private SharedPreferences sharedPreferences;
+    private String orderValue;
+
+    private boolean favoritePressed=false;
 
     public static final String[] MOVIE_DETAIL_PROJECTION = {
             MovieEntry.COLUMN_MOVIE_ID,
@@ -65,12 +78,10 @@ public class DetailActivity extends AppCompatActivity implements
     private Uri mMovieUrlID;
     private static final int ID_DETAIL_LOADER = 353;
     private static final int ID_LOADER_LOADER_FAVORITES=373;
-    String youtubeTrailerSOURCE;
-    private RecyclerView mDetailRecyclerView;
-    private DetailAdapter mDetailAdapter;
-    private String moviePosterUrl;
+    private static final int ID_LOADER_LOADER_FAVORITES_REMOVE=383;
+    private static final int ID_LOADER_FAVORITES_LOAD=400;
 
-    boolean favoritePressed;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,12 +95,15 @@ public class DetailActivity extends AppCompatActivity implements
         mReviewButton=(Button) findViewById(R.id.review_button);
         mMovieCommentsLabel=(TextView) findViewById(R.id.comments_label);
         mMovieCommentsContent=(RecyclerView) findViewById(R.id.reviews_recycler_view);
-        mMoviefavoriteStar=(ImageView) findViewById(R.id.star_image_view);
 
         Intent intentThatStartedThisActivity = getIntent();
 
         mMovieUrlID = intentThatStartedThisActivity.getData();
         mMovieID=intentThatStartedThisActivity.getIntExtra("id",0);
+        sharedPreferences = PreferenceManager.
+                getDefaultSharedPreferences(DetailActivity.this);
+        orderValue = sharedPreferences.getString(getString(R.string.pref_order_key),
+                getString(R.string.pref_popular_value));
 
         mReviewButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -105,15 +119,6 @@ public class DetailActivity extends AppCompatActivity implements
             }
         });
 
-        mMoviefavoriteStar.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mMoviefavoriteStar.setImageResource(R.drawable.full_grey_threed);
-                getSupportLoaderManager().initLoader(ID_LOADER_LOADER_FAVORITES, null, DetailActivity.this);
-
-
-            }
-        });
 
         mDetailRecyclerView = (RecyclerView) findViewById(R.id.reviews_recycler_view);
 
@@ -133,9 +138,52 @@ public class DetailActivity extends AppCompatActivity implements
 
 
         if (mMovieUrlID==null) throw new NullPointerException("URI FOR DETAILACTIVITY cannot be null");
-        getSupportLoaderManager().initLoader(ID_DETAIL_LOADER, null, this);
 
+        if (orderValue.equals("favorite")){
+            getSupportLoaderManager().initLoader(ID_LOADER_FAVORITES_LOAD,null,this);
+        }else {
+            getSupportLoaderManager().initLoader(ID_DETAIL_LOADER, null, this);
+        }
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.detail_screen, menu);
+        MenuItem removeItem=menu.findItem(R.id.remove_favorites);
+        MenuItem addItem=menu.findItem(R.id.add_favorites);
+        if ((orderValue.equals("favorite"))) {
+            removeItem.setVisible(true);
+            addItem.setVisible(false);
+        } else {
+            removeItem.setVisible(false);
+            addItem.setVisible(true);
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.add_favorites) {
+
+            getSupportLoaderManager().initLoader(ID_LOADER_LOADER_FAVORITES, null, DetailActivity.this);
+            item.setVisible(false);
+            return true;
+        }
+
+        if (id==R.id.remove_favorites){
+            getSupportLoaderManager().initLoader(ID_LOADER_LOADER_FAVORITES_REMOVE, null, DetailActivity.this);
+            this.finish();
+
+            return true;
+
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
 
@@ -261,6 +309,35 @@ public class DetailActivity extends AppCompatActivity implements
                 return null;
             }
 
+            //delete implementuoti ir MovieProvider Delete vienam sutvarkyti
+            case ID_LOADER_LOADER_FAVORITES_REMOVE:{
+                AsyncTask<Void, Void, Void> mFetchMovieTask;
+
+                mFetchMovieTask=new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        String [] selectionArgsForUpdate = new String[]{Integer.toString(mMovieID)};
+                        ContentResolver movieContentResolver = getApplicationContext().getContentResolver();
+                        movieContentResolver.delete(mMovieUrlID,
+                                MovieEntry.COLUMN_MOVIE_ID+"=?",
+                                selectionArgsForUpdate);
+                        return null;
+                    }
+                };
+                mFetchMovieTask.execute();
+
+                return null;
+            }
+
+            case ID_LOADER_FAVORITES_LOAD:{
+                return new CursorLoader(this,
+                        mMovieUrlID,
+                        MOVIE_DETAIL_PROJECTION,
+                        null,
+                        null,
+                        null);
+            }
+
             default:
                 throw new RuntimeException("Loader Not Implemented: " + id);
         }
@@ -283,7 +360,10 @@ public class DetailActivity extends AppCompatActivity implements
             return;
         }
         mMovieTitle.setText(data.getString(INDEX_MOVIE_TITLE));
+        mMovieTitle.setVisibility(View.GONE);
+        setTitle(data.getString(INDEX_MOVIE_TITLE));
         mMovieReleaseDate.setText(data.getString(INDEX_MOVIE_RELEASE_DATE));
+
         moviePosterUrl=data.getString(INDEX_MOVIE_POSTER_URI);
         Picasso.with(getApplicationContext()).load(NetworkUtilities.
                 buildUrlForImage(moviePosterUrl, "w500").toString()).into(mMoviePoster);

@@ -21,6 +21,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.example.android.movieapp.MovieAdapter.MovieAdapterOnClickHandler;
 import com.example.android.movieapp.data.MovieContract;
@@ -37,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
     public static final String LOG_TAG = MainActivity.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private MovieAdapter mMovieAdapter;
+    private ProgressBar mLoadingIndicator;
     public static String API_KEY;
     private static boolean PREFERENCES_HAVE_BEEN_UPDATED = false;
     private static final int MOVIE_LOADER_ID = 0;
@@ -50,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
 
     public static final int INDEX_MOVIE_POSTER = 0;
     public static final int INDEX_MOVIE_ID = 1;
+    private int mPosition = RecyclerView.NO_POSITION;
 
 
     @Override
@@ -60,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
 
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_forecast);
+        mLoadingIndicator=(ProgressBar) findViewById(R.id.loading_indicator_main);
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2
                 , GridLayoutManager.VERTICAL, false);
@@ -70,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
 
 
 
+        showLoading();
         getSupportLoaderManager().initLoader(MOVIE_LOADER_ID, null, this);
         PreferenceManager.getDefaultSharedPreferences(this)
                 .registerOnSharedPreferenceChangeListener(this);
@@ -82,7 +88,16 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
         Context context = this;
         Class destinationClass = DetailActivity.class;
         Intent intentToStartDetailActivity = new Intent(context, destinationClass);
-        Uri uriForMovieId= MovieContract.MovieEntry.buildMovieUriWithId(currentMovie);
+        SharedPreferences sharedPreferencesInAssync = PreferenceManager.
+                getDefaultSharedPreferences(MainActivity.this);
+        String orderValueInAssync = sharedPreferencesInAssync.getString(getString(R.string.pref_order_key),
+                getString(R.string.pref_popular_value));
+        Uri uriForMovieId;
+        if (orderValueInAssync.equals("favorite")){
+           uriForMovieId= MovieContract.MovieEntry.buildMovieUriWithIdForFavorites(currentMovie);
+        }else {
+            uriForMovieId = MovieContract.MovieEntry.buildMovieUriWithId(currentMovie);
+        }
         Log.i(LOG_TAG, "URL : "+uriForMovieId);
         intentToStartDetailActivity.putExtra("id", currentMovie);
         intentToStartDetailActivity.setData(uriForMovieId);
@@ -284,6 +299,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data != null) {
             mMovieAdapter.swapCursor(data);
+            if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
+            mRecyclerView.smoothScrollToPosition(mPosition);
+            if (data.getCount() != 0) showMovieDataView();
         }
     }
 
@@ -330,6 +348,14 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
             getSupportLoaderManager().restartLoader(MOVIE_LOADER_ID, null, this);
             PREFERENCES_HAVE_BEEN_UPDATED = false;
         }
+    }
+    private void showLoading() {
+        mRecyclerView.setVisibility(View.INVISIBLE);
+        mLoadingIndicator.setVisibility(View.VISIBLE);
+    }
+    private void showMovieDataView() {
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
+        mRecyclerView.setVisibility(View.VISIBLE);
     }
 
 }

@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.example.android.movieapp.data.MovieContract.MovieEntry;
 
@@ -21,6 +22,7 @@ public class MovieProvider extends ContentProvider{
     public static final int CODE_ALL_MOVIES=100;
     public static final int CODE_ONE_MOVIE=101;
     public static final int CODE_FAVORITE_MOVIES=200;
+    public static final int CODE_FAVORITE_MOVIES_ONE=201;
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private MovieDbHelper mOpenHelper;
@@ -34,6 +36,8 @@ public class MovieProvider extends ContentProvider{
         matcher.addURI(authority, MovieContract.PATH_MOVIE+"/#", CODE_ONE_MOVIE);
 
         matcher.addURI(authority, MovieContract.PATH_MOVIE+"/favorites", CODE_FAVORITE_MOVIES);
+
+        matcher.addURI(authority, MovieEntry.PATH_FAVORITES_FINAL+"/#", CODE_FAVORITE_MOVIES_ONE);
 
         return matcher;
     }
@@ -93,6 +97,25 @@ public class MovieProvider extends ContentProvider{
                         null,
                         null,
                         sortOrder);
+                break;
+            }
+
+            case CODE_FAVORITE_MOVIES_ONE:{
+                String selectedId = uri.getLastPathSegment();
+
+                String[] selectionArguments = new String[]{selectedId};
+                Log.i("BELEKAS", "AS CIA PATEKAU!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+
+                retCursor = mOpenHelper.getReadableDatabase().query(
+
+                        MovieEntry.TABLE_NAME_FAVORITES,
+                        projection,
+                        MovieEntry.COLUMN_MOVIE_ID + " = ? ",
+                        selectionArguments,
+                        null,
+                        null,
+                        sortOrder);
+
                 break;
             }
             default:
@@ -169,13 +192,21 @@ public class MovieProvider extends ContentProvider{
 
         switch (sUriMatcher.match(uri)) {
 
-            case CODE_ALL_MOVIES:
+            case CODE_ALL_MOVIES: {
                 numRowsDeleted = mOpenHelper.getWritableDatabase().delete(
                         MovieEntry.TABLE_NAME,
                         selection,
                         selectionArgs);
 
                 break;
+            }
+            case CODE_FAVORITE_MOVIES_ONE: {
+                numRowsDeleted = mOpenHelper.getWritableDatabase().delete(
+                        MovieEntry.TABLE_NAME_FAVORITES,
+                        selection,
+                        selectionArgs);
+                break;
+            }
 
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
