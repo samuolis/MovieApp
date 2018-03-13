@@ -32,7 +32,7 @@ import com.example.android.movieapp.utilities.NetworkUtilities;
 import com.squareup.picasso.Picasso;
 
 public class DetailActivity extends AppCompatActivity implements
-        LoaderManager.LoaderCallbacks<Cursor>{
+        LoaderManager.LoaderCallbacks<Cursor> {
 
     private TextView mMovieTitle;
     private TextView mMovieReleaseDate;
@@ -52,7 +52,7 @@ public class DetailActivity extends AppCompatActivity implements
     private SharedPreferences sharedPreferences;
     private String orderValue;
 
-    private boolean favoritePressed=false;
+    private boolean favoritePressed = false;
 
     public static final String[] MOVIE_DETAIL_PROJECTION = {
             MovieEntry.COLUMN_MOVIE_ID,
@@ -73,14 +73,13 @@ public class DetailActivity extends AppCompatActivity implements
     public static final int INDEX_MOVIE_OVERVIEW = 5;
     public static final int INDEX_MOVIE_TRAILER_URL = 6;
     public static final int INDEX_MOVIE_REVIEW_STRING = 7;
-    private  int mMovieID;
+    private int mMovieID;
 
     private Uri mMovieUrlID;
     private static final int ID_DETAIL_LOADER = 353;
-    private static final int ID_LOADER_LOADER_FAVORITES=373;
-    private static final int ID_LOADER_LOADER_FAVORITES_REMOVE=383;
-    private static final int ID_LOADER_FAVORITES_LOAD=400;
-
+    private static final int ID_LOADER_LOADER_FAVORITES = 373;
+    private static final int ID_LOADER_LOADER_FAVORITES_REMOVE = 383;
+    private static final int ID_LOADER_FAVORITES_LOAD = 400;
 
 
     @Override
@@ -92,14 +91,14 @@ public class DetailActivity extends AppCompatActivity implements
         mMoviePoster = (ImageView) findViewById(R.id.movie_poster);
         mMovieVotes = (TextView) findViewById(R.id.movie_vote_average);
         mMovieSynopsis = (TextView) findViewById(R.id.movie_plot_synopsis);
-        mReviewButton=(Button) findViewById(R.id.review_button);
-        mMovieCommentsLabel=(TextView) findViewById(R.id.comments_label);
-        mMovieCommentsContent=(RecyclerView) findViewById(R.id.reviews_recycler_view);
+        mReviewButton = (Button) findViewById(R.id.review_button);
+        mMovieCommentsLabel = (TextView) findViewById(R.id.comments_label);
+        mMovieCommentsContent = (RecyclerView) findViewById(R.id.reviews_recycler_view);
 
         Intent intentThatStartedThisActivity = getIntent();
 
         mMovieUrlID = intentThatStartedThisActivity.getData();
-        mMovieID=intentThatStartedThisActivity.getIntExtra("id",0);
+        mMovieID = intentThatStartedThisActivity.getIntExtra("id", 0);
         sharedPreferences = PreferenceManager.
                 getDefaultSharedPreferences(DetailActivity.this);
         orderValue = sharedPreferences.getString(getString(R.string.pref_order_key),
@@ -131,17 +130,12 @@ public class DetailActivity extends AppCompatActivity implements
         mDetailRecyclerView.setAdapter(mDetailAdapter);
 
 
+        if (mMovieUrlID == null)
+            throw new NullPointerException("URI FOR DETAILACTIVITY cannot be null");
 
-
-
-
-
-
-        if (mMovieUrlID==null) throw new NullPointerException("URI FOR DETAILACTIVITY cannot be null");
-
-        if (orderValue.equals("favorite")){
-            getSupportLoaderManager().initLoader(ID_LOADER_FAVORITES_LOAD,null,this);
-        }else {
+        if (orderValue.equals("favorite")) {
+            getSupportLoaderManager().initLoader(ID_LOADER_FAVORITES_LOAD, null, this);
+        } else {
             getSupportLoaderManager().initLoader(ID_DETAIL_LOADER, null, this);
         }
 
@@ -151,8 +145,8 @@ public class DetailActivity extends AppCompatActivity implements
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.detail_screen, menu);
-        MenuItem removeItem=menu.findItem(R.id.remove_favorites);
-        MenuItem addItem=menu.findItem(R.id.add_favorites);
+        MenuItem removeItem = menu.findItem(R.id.remove_favorites);
+        MenuItem addItem = menu.findItem(R.id.add_favorites);
         if ((orderValue.equals("favorite"))) {
             removeItem.setVisible(true);
             addItem.setVisible(false);
@@ -175,7 +169,7 @@ public class DetailActivity extends AppCompatActivity implements
             return true;
         }
 
-        if (id==R.id.remove_favorites){
+        if (id == R.id.remove_favorites) {
             getSupportLoaderManager().initLoader(ID_LOADER_LOADER_FAVORITES_REMOVE, null, DetailActivity.this);
             this.finish();
 
@@ -202,28 +196,25 @@ public class DetailActivity extends AppCompatActivity implements
                 mFetchMovieTask = new AsyncTask<Void, Void, Void>() {
 
 
-
-
                     ContentValues mMoviesTrailersAndReviewsValues;
 
                     @Override
                     protected Void doInBackground(Void... voids) {
                         try {
 
-                            mMoviesTrailersAndReviewsValues= MoviesJsonUtils.
-                                    getSimpleMovieContentValuesFromJsonForTrailers(getApplicationContext(),Integer.toString(mMovieID));
+                            mMoviesTrailersAndReviewsValues = MoviesJsonUtils.
+                                    getSimpleMovieContentValuesFromJsonForTrailers(getApplicationContext(), Integer.toString(mMovieID));
 
 
                             if (mMoviesTrailersAndReviewsValues != null) {
                                 ContentResolver movieContentResolver = getApplicationContext().getContentResolver();
-                                String [] selectionArgsForUpdate = new String[]{Integer.toString(mMovieID)};
+                                String[] selectionArgsForUpdate = new String[]{Integer.toString(mMovieID)};
 
 
-
-                                int rows=movieContentResolver.update(
+                                int rows = movieContentResolver.update(
                                         mMovieUrlID,
                                         mMoviesTrailersAndReviewsValues,
-                                        MovieEntry.COLUMN_MOVIE_ID+"=?",
+                                        MovieEntry.COLUMN_MOVIE_ID + "=?",
                                         selectionArgsForUpdate);
 
                             }
@@ -238,28 +229,28 @@ public class DetailActivity extends AppCompatActivity implements
                     @Override
                     protected void onPostExecute(Void aVoid) {
                         super.onPostExecute(aVoid);
-                        asyncDone=true;
+                        asyncDone = true;
                     }
                 };
 
                 mFetchMovieTask.execute();
 
                 return new CursorLoader(this,
-                            mMovieUrlID,
-                            MOVIE_DETAIL_PROJECTION,
-                            null,
-                            null,
-                            null);
+                        mMovieUrlID,
+                        MOVIE_DETAIL_PROJECTION,
+                        null,
+                        null,
+                        null);
 
 
-
-            }case ID_LOADER_LOADER_FAVORITES:{
+            }
+            case ID_LOADER_LOADER_FAVORITES: {
 
                 AsyncTask<Void, Void, Void> mFetchMovieTask;
 
 
                 mFetchMovieTask = new AsyncTask<Void, Void, Void>() {
-                    ContentValues mMoviesValuesForFavorites=new ContentValues();
+                    ContentValues mMoviesValuesForFavorites = new ContentValues();
 
                     @Override
                     protected Void doInBackground(Void... voids) {
@@ -282,12 +273,8 @@ public class DetailActivity extends AppCompatActivity implements
                             Log.i(LOG_TAG, "Youtube source :" + youtubeTrailerSOURCE);
 
 
-
-
                             if (mMoviesValuesForFavorites != null) {
                                 ContentResolver movieContentResolver = getApplicationContext().getContentResolver();
-
-
 
 
                                 movieContentResolver.insert(
@@ -310,16 +297,16 @@ public class DetailActivity extends AppCompatActivity implements
             }
 
             //delete implementuoti ir MovieProvider Delete vienam sutvarkyti
-            case ID_LOADER_LOADER_FAVORITES_REMOVE:{
+            case ID_LOADER_LOADER_FAVORITES_REMOVE: {
                 AsyncTask<Void, Void, Void> mFetchMovieTask;
 
-                mFetchMovieTask=new AsyncTask<Void, Void, Void>() {
+                mFetchMovieTask = new AsyncTask<Void, Void, Void>() {
                     @Override
                     protected Void doInBackground(Void... voids) {
-                        String [] selectionArgsForUpdate = new String[]{Integer.toString(mMovieID)};
+                        String[] selectionArgsForUpdate = new String[]{Integer.toString(mMovieID)};
                         ContentResolver movieContentResolver = getApplicationContext().getContentResolver();
                         movieContentResolver.delete(mMovieUrlID,
-                                MovieEntry.COLUMN_MOVIE_ID+"=?",
+                                MovieEntry.COLUMN_MOVIE_ID + "=?",
                                 selectionArgsForUpdate);
                         return null;
                     }
@@ -329,7 +316,7 @@ public class DetailActivity extends AppCompatActivity implements
                 return null;
             }
 
-            case ID_LOADER_FAVORITES_LOAD:{
+            case ID_LOADER_FAVORITES_LOAD: {
                 return new CursorLoader(this,
                         mMovieUrlID,
                         MOVIE_DETAIL_PROJECTION,
@@ -343,12 +330,10 @@ public class DetailActivity extends AppCompatActivity implements
         }
 
 
-
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-
 
 
         boolean cursorHasValidData = false;
@@ -364,15 +349,15 @@ public class DetailActivity extends AppCompatActivity implements
         setTitle(data.getString(INDEX_MOVIE_TITLE));
         mMovieReleaseDate.setText(data.getString(INDEX_MOVIE_RELEASE_DATE));
 
-        moviePosterUrl=data.getString(INDEX_MOVIE_POSTER_URI);
+        moviePosterUrl = data.getString(INDEX_MOVIE_POSTER_URI);
         Picasso.with(getApplicationContext()).load(NetworkUtilities.
                 buildUrlForImage(moviePosterUrl, "w500").toString()).into(mMoviePoster);
         mMovieVotes.setText(data.getString(INDEX_MOVIE_VOTE_AVERAGE));
         mMovieSynopsis.setText(data.getString(INDEX_MOVIE_OVERVIEW));
-        youtubeTrailerSOURCE=data.getString(INDEX_MOVIE_TRAILER_URL);
+        youtubeTrailerSOURCE = data.getString(INDEX_MOVIE_TRAILER_URL);
 
 
-        if (data.getString(INDEX_MOVIE_REVIEW_STRING)!=null&&!data.getString(INDEX_MOVIE_REVIEW_STRING).equals("")) {
+        if (data.getString(INDEX_MOVIE_REVIEW_STRING) != null && !data.getString(INDEX_MOVIE_REVIEW_STRING).equals("")) {
             mMovieCommentsLabel.setVisibility(View.VISIBLE);
             mMovieCommentsContent.setVisibility(View.VISIBLE);
             String[] movieReviewStringArray = MoviesJsonUtils.convertStringToArray(data.getString(INDEX_MOVIE_REVIEW_STRING), MoviesJsonUtils.separator1);
@@ -381,12 +366,8 @@ public class DetailActivity extends AppCompatActivity implements
         } else {
             mMovieCommentsLabel.setVisibility(View.GONE);
             mMovieCommentsContent.setVisibility(View.GONE);
+
         }
-
-
-
-
-
 
 
     }

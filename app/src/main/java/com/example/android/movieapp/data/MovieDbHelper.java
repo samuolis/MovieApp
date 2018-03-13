@@ -12,40 +12,40 @@ import com.example.android.movieapp.data.MovieContract.MovieEntry;
 
 public class MovieDbHelper extends SQLiteOpenHelper {
 
-    public static final String DATABASE_NAME="movie.db";
-    public static final int DATABASE_VERSION=3;
+    public static final String DATABASE_NAME = "movie.db";
+    public static final int DATABASE_VERSION = 3;
 
-    public MovieDbHelper(Context context){
+    public MovieDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
 
-        final String SQL_CREATE_MOVIE_TABLE=
-                "CREATE TABLE "+ MovieEntry.TABLE_NAME+" ("+
-                        MovieEntry._ID+" INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                        MovieEntry.COLUMN_MOVIE_ID+" INTEGER NOT NULL, "+
-                        MovieEntry.COLUMN_MOVIE_TITLE+" TEXT NOT NULL, "+
-                        MovieEntry.COLUMN_MOVIE_RELEASE_DATE +" INTEGER NOT NULL, "+
-                        MovieEntry.COLUMN_MOVIE_POSTER_URL +" TEXT NOT NULL, "+
-                        MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE+" REAL NOT NULL, "+
-                        MovieEntry.COLUMN_MOVIE_OVERVIEW+" TEXT NOT NULL, "+
-                        MovieEntry.COLUMN_MOVIE_TRAILER_URL+" TEXT, "+
-                        MovieEntry.COLUMN_MOVIE_REVIEW_STRING+" TEXT, "+
+        final String SQL_CREATE_MOVIE_TABLE =
+                "CREATE TABLE " + MovieEntry.TABLE_NAME + " (" +
+                        MovieEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        MovieEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +
+                        MovieEntry.COLUMN_MOVIE_TITLE + " TEXT NOT NULL, " +
+                        MovieEntry.COLUMN_MOVIE_RELEASE_DATE + " INTEGER NOT NULL, " +
+                        MovieEntry.COLUMN_MOVIE_POSTER_URL + " TEXT NOT NULL, " +
+                        MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE + " REAL NOT NULL, " +
+                        MovieEntry.COLUMN_MOVIE_OVERVIEW + " TEXT NOT NULL, " +
+                        MovieEntry.COLUMN_MOVIE_TRAILER_URL + " TEXT, " +
+                        MovieEntry.COLUMN_MOVIE_REVIEW_STRING + " TEXT, " +
                         " UNIQUE (" + MovieEntry.COLUMN_MOVIE_ID + ") ON CONFLICT REPLACE);";
 
-        final String SQL_CREATE_MOVIE_TABLE_FAVORITES=
-                "CREATE TABLE "+ MovieEntry.TABLE_NAME_FAVORITES+" ("+
-                        MovieEntry._ID+" INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                        MovieEntry.COLUMN_MOVIE_ID+" INTEGER NOT NULL, "+
-                        MovieEntry.COLUMN_MOVIE_TITLE+" TEXT NOT NULL, "+
-                        MovieEntry.COLUMN_MOVIE_RELEASE_DATE +" INTEGER NOT NULL, "+
-                        MovieEntry.COLUMN_MOVIE_POSTER_URL +" TEXT NOT NULL, "+
-                        MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE+" REAL NOT NULL, "+
-                        MovieEntry.COLUMN_MOVIE_OVERVIEW+" TEXT NOT NULL, "+
-                        MovieEntry.COLUMN_MOVIE_TRAILER_URL+" TEXT, "+
-                        MovieEntry.COLUMN_MOVIE_REVIEW_STRING+" TEXT, "+
+        final String SQL_CREATE_MOVIE_TABLE_FAVORITES =
+                "CREATE TABLE " + MovieEntry.TABLE_NAME_FAVORITES + " (" +
+                        MovieEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        MovieEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +
+                        MovieEntry.COLUMN_MOVIE_TITLE + " TEXT NOT NULL, " +
+                        MovieEntry.COLUMN_MOVIE_RELEASE_DATE + " INTEGER NOT NULL, " +
+                        MovieEntry.COLUMN_MOVIE_POSTER_URL + " TEXT NOT NULL, " +
+                        MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE + " REAL NOT NULL, " +
+                        MovieEntry.COLUMN_MOVIE_OVERVIEW + " TEXT NOT NULL, " +
+                        MovieEntry.COLUMN_MOVIE_TRAILER_URL + " TEXT, " +
+                        MovieEntry.COLUMN_MOVIE_REVIEW_STRING + " TEXT, " +
                         " UNIQUE (" + MovieEntry.COLUMN_MOVIE_ID + ") ON CONFLICT REPLACE);";
 
         db.execSQL(SQL_CREATE_MOVIE_TABLE);
@@ -55,8 +55,8 @@ public class MovieDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " +MovieEntry.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " +MovieEntry.TABLE_NAME_FAVORITES);
+        db.execSQL("DROP TABLE IF EXISTS " + MovieEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + MovieEntry.TABLE_NAME_FAVORITES);
         onCreate(db);
     }
 }

@@ -44,13 +44,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
     private static boolean PREFERENCES_HAVE_BEEN_UPDATED = false;
     private static final int MOVIE_LOADER_ID = 0;
 
-    public static final String FAVORITE_PATH="favorites";
-    public static final String FAVORITE_PREF="favorite";
-    public static final String POPULAR_PREF="popular";
-    public static final String TOP_RATED_PREF="top_rated";
+    public static final String FAVORITE_PATH = "favorites";
+    public static final String FAVORITE_PREF = "favorite";
+    public static final String POPULAR_PREF = "popular";
+    public static final String TOP_RATED_PREF = "top_rated";
 
 
-    public  static final String[] MAIN_MOVIE_PROJECTION={
+    public static final String[] MAIN_MOVIE_PROJECTION = {
             MovieEntry.COLUMN_MOVIE_POSTER_URL,
             MovieEntry.COLUMN_MOVIE_ID,
     };
@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
 
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_forecast);
-        mLoadingIndicator=(ProgressBar) findViewById(R.id.loading_indicator_main);
+        mLoadingIndicator = (ProgressBar) findViewById(R.id.loading_indicator_main);
 
         gridLayoutManager = new GridLayoutManager(this, 2
                 , GridLayoutManager.VERTICAL, false);
@@ -83,7 +83,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
         mRecyclerView.setHasFixedSize(true);
         mMovieAdapter = new MovieAdapter(this, this);
         mRecyclerView.setAdapter(mMovieAdapter);
-
 
 
         showLoading();
@@ -101,18 +100,16 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
         Intent intentToStartDetailActivity = new Intent(context, destinationClass);
 
         Uri uriForMovieId;
-        if (orderValueInAssync.equals("favorite")){
-           uriForMovieId= MovieContract.MovieEntry.buildMovieUriWithIdForFavorites(currentMovie);
-        }else {
+        if (orderValueInAssync.equals("favorite")) {
+            uriForMovieId = MovieContract.MovieEntry.buildMovieUriWithIdForFavorites(currentMovie);
+        } else {
             uriForMovieId = MovieContract.MovieEntry.buildMovieUriWithId(currentMovie);
         }
-        Log.i(LOG_TAG, "URL : "+uriForMovieId);
+        Log.i(LOG_TAG, "URL : " + uriForMovieId);
         intentToStartDetailActivity.putExtra("id", currentMovie);
         intentToStartDetailActivity.setData(uriForMovieId);
         startActivity(intentToStartDetailActivity);
     }
-
-
 
 
     @Override
@@ -129,9 +126,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
         orderValueInAssync = sharedPreferencesInAssync.getString(getString(R.string.pref_order_key),
                 getString(R.string.pref_popular_value));
 
-        Log.i(LOG_TAG, "orderValue!!!!!!!!!!!!!!!!!! "+orderValueInAssync);
+        Log.i(LOG_TAG, "orderValue!!!!!!!!!!!!!!!!!! " + orderValueInAssync);
 
-        if (orderValueInAssync.equals("popular")||orderValueInAssync.equals("top_rated")) {
+        if (orderValueInAssync.equals("popular") || orderValueInAssync.equals("top_rated")) {
 
             AsyncTask<Void, Void, Void> mFetchMovieTask;
 
@@ -278,13 +275,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
                 default:
                     throw new RuntimeException("Loader Not Implemented: " + id);
             }
-        }else
-        {
+        } else {
 
             switch (id) {
                 case MOVIE_LOADER_ID:
                     Uri favoriteMovieQueryUri = MovieEntry.CONTENT_URI;
-                    Uri favoriteQuerry=favoriteMovieQueryUri.buildUpon().appendPath(FAVORITE_PATH).build();
+                    Uri favoriteQuerry = favoriteMovieQueryUri.buildUpon().appendPath(FAVORITE_PATH).build();
 
 
                     return new CursorLoader(this,
@@ -311,7 +307,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
             mRecyclerView.smoothScrollToPosition(mPosition);
             if (data.getCount() != 0) showMovieDataView();
         }
-
 
 
         switch (orderValueInAssync) {
@@ -374,10 +369,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
             PREFERENCES_HAVE_BEEN_UPDATED = false;
         }
     }
+
     private void showLoading() {
         mRecyclerView.setVisibility(View.INVISIBLE);
         mLoadingIndicator.setVisibility(View.VISIBLE);
     }
+
     private void showMovieDataView() {
         mLoadingIndicator.setVisibility(View.INVISIBLE);
         mRecyclerView.setVisibility(View.VISIBLE);

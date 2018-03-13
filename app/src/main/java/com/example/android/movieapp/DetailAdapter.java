@@ -57,16 +57,16 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.DetailAdap
         }
 
         void bind(int listIndex) {
-                String movieReviewData[] = mReviewData[listIndex].split("#");
-                if (movieReviewData.length>1) {
-                    mNameTextView.setText(movieReviewData[0]);
-                    mReviewTextView.setText(movieReviewData[1]);
-                }
+            String movieReviewData[] = mReviewData[listIndex].split("#");
+            if (movieReviewData.length > 1) {
+                mNameTextView.setText(movieReviewData[0]);
+                mReviewTextView.setText(movieReviewData[1]);
+            }
         }
 
     }
 
-//    void swapCursor(Cursor newCursor) {
+    //    void swapCursor(Cursor newCursor) {
 //        mCursor = newCursor;
 //        notifyDataSetChanged();
 //    }

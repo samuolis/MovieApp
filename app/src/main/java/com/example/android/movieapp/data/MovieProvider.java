@@ -16,34 +16,34 @@ import com.example.android.movieapp.data.MovieContract.MovieEntry;
  * Created by Lukas on 2018-03-08.
  */
 
-public class MovieProvider extends ContentProvider{
+public class MovieProvider extends ContentProvider {
 
-    public static final int CODE_ALL_MOVIES=100;
-    public static final int CODE_ONE_MOVIE=101;
-    public static final int CODE_FAVORITE_MOVIES=200;
-    public static final int CODE_FAVORITE_MOVIES_ONE=201;
+    public static final int CODE_ALL_MOVIES = 100;
+    public static final int CODE_ONE_MOVIE = 101;
+    public static final int CODE_FAVORITE_MOVIES = 200;
+    public static final int CODE_FAVORITE_MOVIES_ONE = 201;
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private MovieDbHelper mOpenHelper;
 
-    public static UriMatcher buildUriMatcher(){
+    public static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = MovieContract.CONTENT_AUTHORITY;
 
         matcher.addURI(authority, MovieContract.PATH_MOVIE, CODE_ALL_MOVIES);
 
-        matcher.addURI(authority, MovieContract.PATH_MOVIE+"/#", CODE_ONE_MOVIE);
+        matcher.addURI(authority, MovieContract.PATH_MOVIE + "/#", CODE_ONE_MOVIE);
 
-        matcher.addURI(authority, MovieContract.PATH_MOVIE+"/favorites", CODE_FAVORITE_MOVIES);
+        matcher.addURI(authority, MovieContract.PATH_MOVIE + "/favorites", CODE_FAVORITE_MOVIES);
 
-        matcher.addURI(authority, MovieEntry.PATH_FAVORITES_FINAL+"/#", CODE_FAVORITE_MOVIES_ONE);
+        matcher.addURI(authority, MovieEntry.PATH_FAVORITES_FINAL + "/#", CODE_FAVORITE_MOVIES_ONE);
 
         return matcher;
     }
 
     @Override
     public boolean onCreate() {
-        mOpenHelper=new MovieDbHelper(getContext());
+        mOpenHelper = new MovieDbHelper(getContext());
         return true;
     }
 
@@ -88,7 +88,7 @@ public class MovieProvider extends ContentProvider{
                 break;
             }
 
-            case CODE_FAVORITE_MOVIES:{
+            case CODE_FAVORITE_MOVIES: {
                 retCursor = db.query(MovieEntry.TABLE_NAME_FAVORITES,
                         projection,
                         selection,
@@ -99,7 +99,7 @@ public class MovieProvider extends ContentProvider{
                 break;
             }
 
-            case CODE_FAVORITE_MOVIES_ONE:{
+            case CODE_FAVORITE_MOVIES_ONE: {
                 String selectedId = uri.getLastPathSegment();
 
                 String[] selectionArguments = new String[]{selectedId};
@@ -164,6 +164,7 @@ public class MovieProvider extends ContentProvider{
                 return super.bulkInsert(uri, values);
         }
     }
+
     //using only for favorites, so no switch statement
     @Nullable
     @Override
@@ -173,7 +174,7 @@ public class MovieProvider extends ContentProvider{
         Uri returnUri;
 
         long id = db.insert(MovieEntry.TABLE_NAME_FAVORITES, null, values);
-        if ( id > 0 ) {
+        if (id > 0) {
             returnUri = ContentUris.withAppendedId(MovieEntry.CONTENT_URI, id);
         } else {
             throw new android.database.SQLException("Failed to insert row into " + uri);

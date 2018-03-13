@@ -5,15 +5,13 @@
     tools:context=".DetailActivity">
     <item
         android:id="@+id/add_favorites"
-        android:title="Add to favorites"
-        app:showAsAction="never"
         android:orderInCategory="100"
-        />
+        android:title="Add to favorites"
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/remove_favorites"
-        android:title="Remove from favorites"
-        app:showAsAction="never"
         android:orderInCategory="101"
-        />
+        android:title="Remove from favorites"
+        app:showAsAction="never" />
 </menu>

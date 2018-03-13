@@ -24,7 +24,7 @@ public class NetworkUtilities {
 
     private static final String MOVIE_IMAGE_BASE_URL = "http://image.tmdb.org/t/p";
     private static final String MOVIE_BASE_URL = MOVIE_URL;
-    private static final String MOVIE_YOUTUBE_BASE_URL="https://www.youtube.com/watch?v=";
+    private static final String MOVIE_YOUTUBE_BASE_URL = "https://www.youtube.com/watch?v=";
 
 
     final static String QUERY_MOVIES = "movie";
@@ -84,8 +84,8 @@ public class NetworkUtilities {
         return url;
     }
 
-    public static URL buildUrlForTrailerVideo(String source){
-        Uri builtUri = Uri.parse(MOVIE_YOUTUBE_BASE_URL+source).buildUpon()
+    public static URL buildUrlForTrailerVideo(String source) {
+        Uri builtUri = Uri.parse(MOVIE_YOUTUBE_BASE_URL + source).buildUpon()
                 .build();
         URL url = null;
         try {

@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    >
-
+    android:layout_height="wrap_content">
 
 
     <LinearLayout
@@ -15,37 +12,34 @@
         android:layout_height="wrap_content"
 
 
-        android:orientation="horizontal"
-        >
+        android:orientation="horizontal">
 
 
         <TextView
             android:id="@+id/reviewer_name"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:gravity="center"
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            tools:text="Lukas"
             android:background="@color/colorPrimaryLight"
-            android:textColor="@android:color/white"
+            android:gravity="center"
             android:paddingLeft="8dp"
-            android:paddingRight="8dp"/>
+            android:paddingRight="8dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textColor="@android:color/white"
+            tools:text="Lukas" />
 
         <TextView
             android:id="@+id/reviwer_message"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_margin="15dp"
             android:layout_weight="4"
             android:gravity="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             tools:layout_editor_absoluteX="42dp"
             tools:layout_editor_absoluteY="3dp"
-            tools:text="It was a nice movie"
-            android:layout_margin="15dp"
-            />
-
+            tools:text="It was a nice movie" />
 
 
     </LinearLayout>
@@ -59,7 +53,6 @@
         app:layout_constraintTop_toBottomOf="@+id/detail_review_linear">
 
 
-
         <View
             android:id="@+id/line_second"
             android:layout_width="match_parent"
@@ -69,10 +62,6 @@
 
 
     </LinearLayout>
-
-
-
-
 
 
 </android.support.constraint.ConstraintLayout>
