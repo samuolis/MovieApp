@@ -370,16 +370,12 @@ public class DetailActivity extends AppCompatActivity implements
         mMovieVotes.setText(data.getString(INDEX_MOVIE_VOTE_AVERAGE));
         mMovieSynopsis.setText(data.getString(INDEX_MOVIE_OVERVIEW));
         youtubeTrailerSOURCE=data.getString(INDEX_MOVIE_TRAILER_URL);
-        //Log.i(LOG_TAG, "Got String : " +data.getString(INDEX_MOVIE_REVIEW_STRING));
 
 
-        //TODO when i uncoment this line above Log getting null value, but when i comment it everything is fine
         if (data.getString(INDEX_MOVIE_REVIEW_STRING)!=null&&!data.getString(INDEX_MOVIE_REVIEW_STRING).equals("")) {
             mMovieCommentsLabel.setVisibility(View.VISIBLE);
             mMovieCommentsContent.setVisibility(View.VISIBLE);
             String[] movieReviewStringArray = MoviesJsonUtils.convertStringToArray(data.getString(INDEX_MOVIE_REVIEW_STRING), MoviesJsonUtils.separator1);
-
-            Log.i(LOG_TAG, "AS CIAAAAAAAAAAAAAAAAAAAA !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
             mDetailAdapter.setReviewData(movieReviewStringArray);
         } else {

@@ -45,6 +45,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
     private static final int MOVIE_LOADER_ID = 0;
 
     public static final String FAVORITE_PATH="favorites";
+    public static final String FAVORITE_PREF="favorite";
+    public static final String POPULAR_PREF="popular";
+    public static final String TOP_RATED_PREF="top_rated";
+
 
     public  static final String[] MAIN_MOVIE_PROJECTION={
             MovieEntry.COLUMN_MOVIE_POSTER_URL,
@@ -54,6 +58,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
     public static final int INDEX_MOVIE_POSTER = 0;
     public static final int INDEX_MOVIE_ID = 1;
     private int mPosition = RecyclerView.NO_POSITION;
+    SharedPreferences sharedPreferencesInAssync;
+    String orderValueInAssync;
+    GridLayoutManager gridLayoutManager;
 
 
     @Override
@@ -61,12 +68,16 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         API_KEY = getString(R.string.api_key_movies);
+        sharedPreferencesInAssync = PreferenceManager.
+                getDefaultSharedPreferences(MainActivity.this);
+        orderValueInAssync = sharedPreferencesInAssync.getString(getString(R.string.pref_order_key),
+                getString(R.string.pref_popular_value));
 
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_forecast);
         mLoadingIndicator=(ProgressBar) findViewById(R.id.loading_indicator_main);
 
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2
+        gridLayoutManager = new GridLayoutManager(this, 2
                 , GridLayoutManager.VERTICAL, false);
         mRecyclerView.setLayoutManager(gridLayoutManager);
         mRecyclerView.setHasFixedSize(true);
@@ -88,10 +99,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
         Context context = this;
         Class destinationClass = DetailActivity.class;
         Intent intentToStartDetailActivity = new Intent(context, destinationClass);
-        SharedPreferences sharedPreferencesInAssync = PreferenceManager.
-                getDefaultSharedPreferences(MainActivity.this);
-        String orderValueInAssync = sharedPreferencesInAssync.getString(getString(R.string.pref_order_key),
-                getString(R.string.pref_popular_value));
+
         Uri uriForMovieId;
         if (orderValueInAssync.equals("favorite")){
            uriForMovieId= MovieContract.MovieEntry.buildMovieUriWithIdForFavorites(currentMovie);
@@ -104,6 +112,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
         startActivity(intentToStartDetailActivity);
     }
 
+
+
+
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         PREFERENCES_HAVE_BEEN_UPDATED = true;
@@ -112,14 +123,15 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle loaderArgs) {
-        SharedPreferences sharedPreferences = PreferenceManager.
+
+        sharedPreferencesInAssync = PreferenceManager.
                 getDefaultSharedPreferences(MainActivity.this);
-        String orderValue = sharedPreferences.getString(getString(R.string.pref_order_key),
+        orderValueInAssync = sharedPreferencesInAssync.getString(getString(R.string.pref_order_key),
                 getString(R.string.pref_popular_value));
 
-        Log.i(LOG_TAG, "orderValue!!!!!!!!!!!!!!!!!! "+orderValue);
+        Log.i(LOG_TAG, "orderValue!!!!!!!!!!!!!!!!!! "+orderValueInAssync);
 
-        if (orderValue.equals("popular")||orderValue.equals("top_rated")) {
+        if (orderValueInAssync.equals("popular")||orderValueInAssync.equals("top_rated")) {
 
             AsyncTask<Void, Void, Void> mFetchMovieTask;
 
@@ -129,11 +141,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
                 @Override
                 protected Void doInBackground(Void... voids) {
                     try {
-
-                        SharedPreferences sharedPreferencesInAssync = PreferenceManager.
-                                getDefaultSharedPreferences(MainActivity.this);
-                        String orderValueInAssync = sharedPreferencesInAssync.getString(getString(R.string.pref_order_key),
-                                getString(R.string.pref_popular_value));
 
 
                         URL moviesRequestUrl = NetworkUtilities.buildUrl(orderValueInAssync);
@@ -152,7 +159,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
                                     MovieEntry.CONTENT_URI,
                                     null,
                                     null);
-                            Log.i(LOG_TAG, "bulk INSERTASSSSS");
 
                             movieContentResolver.bulkInsert(
                                     MovieEntry.CONTENT_URI,
@@ -281,7 +287,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
                     Uri favoriteQuerry=favoriteMovieQueryUri.buildUpon().appendPath(FAVORITE_PATH).build();
 
 
-                    Log.i(LOG_TAG, "LINKAS !!!!!!!!! "+favoriteQuerry);
                     return new CursorLoader(this,
                             favoriteQuerry,
                             MAIN_MOVIE_PROJECTION,
@@ -295,13 +300,35 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
         }
     }
 
+
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
         if (data != null) {
+
             mMovieAdapter.swapCursor(data);
             if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
             mRecyclerView.smoothScrollToPosition(mPosition);
             if (data.getCount() != 0) showMovieDataView();
+        }
+
+
+
+        switch (orderValueInAssync) {
+            case FAVORITE_PREF: {
+                setTitle("Favorites");
+                break;
+            }
+            case TOP_RATED_PREF: {
+                setTitle("Top Rated");
+                break;
+            }
+            case POPULAR_PREF: {
+                setTitle("Popular");
+                break;
+            }
+            default:
+                throw new RuntimeException("Sharred Pref not selected : " + orderValueInAssync);
         }
     }
 
@@ -342,9 +369,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
     @Override
     protected void onStart() {
         super.onStart();
-        Log.i(LOG_TAG, "pries ifa!!!!!!!!!!!");
         if (PREFERENCES_HAVE_BEEN_UPDATED) {
-            Log.i(LOG_TAG, "po ifo!!!!!!!!!!!");
             getSupportLoaderManager().restartLoader(MOVIE_LOADER_ID, null, this);
             PREFERENCES_HAVE_BEEN_UPDATED = false;
         }

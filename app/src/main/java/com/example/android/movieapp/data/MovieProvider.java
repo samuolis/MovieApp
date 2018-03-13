@@ -9,7 +9,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.example.android.movieapp.data.MovieContract.MovieEntry;
 
@@ -104,7 +103,6 @@ public class MovieProvider extends ContentProvider{
                 String selectedId = uri.getLastPathSegment();
 
                 String[] selectionArguments = new String[]{selectedId};
-                Log.i("BELEKAS", "AS CIA PATEKAU!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
                 retCursor = mOpenHelper.getReadableDatabase().query(
 
