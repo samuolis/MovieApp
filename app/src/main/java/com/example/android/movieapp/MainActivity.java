@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -48,6 +49,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
     public static final String FAVORITE_PREF = "favorite";
     public static final String POPULAR_PREF = "popular";
     public static final String TOP_RATED_PREF = "top_rated";
+    private static final String BUNDLE_RECYCLER_LAYOUT = "mainActivity.recycler.layout";
+    private Parcelable mListState;
 
 
     public static final String[] MAIN_MOVIE_PROJECTION = {
@@ -58,9 +61,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
     public static final int INDEX_MOVIE_POSTER = 0;
     public static final int INDEX_MOVIE_ID = 1;
     private int mPosition = RecyclerView.NO_POSITION;
+    private int lastFirstVisiblePosition;
     SharedPreferences sharedPreferencesInAssync;
     String orderValueInAssync;
-    GridLayoutManager gridLayoutManager;
+    private GridLayoutManager gridLayoutManager;
 
 
     @Override
@@ -87,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
 
         showLoading();
         getSupportLoaderManager().initLoader(MOVIE_LOADER_ID, null, this);
+
         PreferenceManager.getDefaultSharedPreferences(this)
                 .registerOnSharedPreferenceChangeListener(this);
 
@@ -309,6 +314,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
         }
 
 
+
         switch (orderValueInAssync) {
             case FAVORITE_PREF: {
                 setTitle("Favorites");
@@ -369,6 +375,27 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
             PREFERENCES_HAVE_BEEN_UPDATED = false;
         }
     }
+
+    protected void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
+        Log.i(LOG_TAG, "ON SAVE!!!!!!!!!!!!!!");
+
+        mListState = gridLayoutManager.onSaveInstanceState();
+        state.putParcelable(BUNDLE_RECYCLER_LAYOUT, mListState);
+
+
+    }
+
+    protected void onRestoreInstanceState(Bundle state) {
+        super.onRestoreInstanceState(state);
+        Log.i(LOG_TAG, "ON RESTORE!!!!!!!!!!!!!!");
+        if (state != null) {
+            mListState = state.getParcelable(BUNDLE_RECYCLER_LAYOUT);
+            mRecyclerView.getLayoutManager().onRestoreInstanceState(mListState);
+        }
+//
+    }
+
 
     private void showLoading() {
         mRecyclerView.setVisibility(View.INVISIBLE);

@@ -53,6 +53,7 @@ public class MoviesJsonUtils {
         final String OWN_MOVIE_VOTE = "vote_average";
         final String OWN_OVERVIEW = "overview";
         final String OWN_ID = "id";
+        final String OWN_MOVIE_BACKDROP="backdrop_path";
 
 
         JSONObject moviesJson = new JSONObject(moviesJsonStr);
@@ -87,6 +88,7 @@ public class MoviesJsonUtils {
             String movieVote = movieById.getString(OWN_MOVIE_VOTE);
             String movieOverview = movieById.getString(OWN_OVERVIEW);
             String movieId = movieById.getString(OWN_ID);
+            String movieBackdrop=movieById.getString(OWN_MOVIE_BACKDROP);
 
 
 //            String reviewJSON=NetworkUtilities.getResponseFromHttpUrl(NetworkUtilities.
@@ -111,6 +113,7 @@ public class MoviesJsonUtils {
             movieValue.put(MovieEntry.COLUMN_MOVIE_POSTER_URL, imagePath);
             movieValue.put(MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE, movieVote);
             movieValue.put(MovieEntry.COLUMN_MOVIE_OVERVIEW, movieOverview);
+            movieValue.put(MovieEntry.COLUMN_MOVIE_BACKDROP_PATH, movieBackdrop);
 
 
             movieContentValues[i] = movieValue;

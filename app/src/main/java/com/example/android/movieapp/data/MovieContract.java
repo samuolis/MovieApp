@@ -43,6 +43,8 @@ public class MovieContract {
 
         public static final String COLUMN_MOVIE_REVIEW_STRING = "review";
 
+        public static final String COLUMN_MOVIE_BACKDROP_PATH="backdrop";
+
 
         public static Uri buildMovieUriWithId(int id) {
             return CONTENT_URI.buildUpon()

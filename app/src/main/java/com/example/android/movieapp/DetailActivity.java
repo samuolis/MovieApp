@@ -9,13 +9,16 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -47,10 +50,14 @@ public class DetailActivity extends AppCompatActivity implements
     public static Boolean asyncDone;
     private String youtubeTrailerSOURCE;
     private RecyclerView mDetailRecyclerView;
+    private CollapsingToolbarLayout collapsingToolbarLayout;
     private DetailAdapter mDetailAdapter;
     private String moviePosterUrl;
     private SharedPreferences sharedPreferences;
     private String orderValue;
+    Toolbar toolbar;
+    private ImageView backdrop;
+    private String backdropPath;
 
     private boolean favoritePressed = false;
 
@@ -62,7 +69,8 @@ public class DetailActivity extends AppCompatActivity implements
             MovieEntry.COLUMN_MOVIE_VOTE_AVERAGE,
             MovieEntry.COLUMN_MOVIE_OVERVIEW,
             MovieEntry.COLUMN_MOVIE_TRAILER_URL,
-            MovieEntry.COLUMN_MOVIE_REVIEW_STRING
+            MovieEntry.COLUMN_MOVIE_REVIEW_STRING,
+            MovieEntry.COLUMN_MOVIE_BACKDROP_PATH
     };
 
     public static final int INDEX_MOVIE_ID = 0;
@@ -73,6 +81,7 @@ public class DetailActivity extends AppCompatActivity implements
     public static final int INDEX_MOVIE_OVERVIEW = 5;
     public static final int INDEX_MOVIE_TRAILER_URL = 6;
     public static final int INDEX_MOVIE_REVIEW_STRING = 7;
+    public static final int INDEX_MOVIE_BACKDROP_PATH = 8;
     private int mMovieID;
 
     private Uri mMovieUrlID;
@@ -94,6 +103,17 @@ public class DetailActivity extends AppCompatActivity implements
         mReviewButton = (Button) findViewById(R.id.review_button);
         mMovieCommentsLabel = (TextView) findViewById(R.id.comments_label);
         mMovieCommentsContent = (RecyclerView) findViewById(R.id.reviews_recycler_view);
+        collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
+        backdrop=(ImageView) findViewById(R.id.backdrop);
+        mDetailRecyclerView=(RecyclerView) findViewById(R.id.reviews_recycler_view);
+        mDetailRecyclerView.setFocusable(false);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
 
         Intent intentThatStartedThisActivity = getIntent();
 
@@ -271,6 +291,7 @@ public class DetailActivity extends AppCompatActivity implements
                             Log.i(LOG_TAG, "Movies Overview :" + mMovieSynopsis.getText().toString());
                             mMoviesValuesForFavorites.put(MovieEntry.COLUMN_MOVIE_TRAILER_URL, youtubeTrailerSOURCE);
                             Log.i(LOG_TAG, "Youtube source :" + youtubeTrailerSOURCE);
+                            mMoviesValuesForFavorites.put(MovieEntry.COLUMN_MOVIE_BACKDROP_PATH, backdropPath);
 
 
                             if (mMoviesValuesForFavorites != null) {
@@ -346,7 +367,7 @@ public class DetailActivity extends AppCompatActivity implements
         }
         mMovieTitle.setText(data.getString(INDEX_MOVIE_TITLE));
         mMovieTitle.setVisibility(View.GONE);
-        setTitle(data.getString(INDEX_MOVIE_TITLE));
+        toolbar.setTitle(data.getString(INDEX_MOVIE_TITLE));
         mMovieReleaseDate.setText(data.getString(INDEX_MOVIE_RELEASE_DATE));
 
         moviePosterUrl = data.getString(INDEX_MOVIE_POSTER_URI);
@@ -355,12 +376,16 @@ public class DetailActivity extends AppCompatActivity implements
         mMovieVotes.setText(data.getString(INDEX_MOVIE_VOTE_AVERAGE));
         mMovieSynopsis.setText(data.getString(INDEX_MOVIE_OVERVIEW));
         youtubeTrailerSOURCE = data.getString(INDEX_MOVIE_TRAILER_URL);
+        backdropPath=data.getString(INDEX_MOVIE_BACKDROP_PATH);
+        Picasso.with(getApplicationContext()).load(NetworkUtilities.
+                buildUrlForImage(backdropPath, "w500").toString()).into(backdrop);
 
 
         if (data.getString(INDEX_MOVIE_REVIEW_STRING) != null && !data.getString(INDEX_MOVIE_REVIEW_STRING).equals("")) {
             mMovieCommentsLabel.setVisibility(View.VISIBLE);
             mMovieCommentsContent.setVisibility(View.VISIBLE);
-            String[] movieReviewStringArray = MoviesJsonUtils.convertStringToArray(data.getString(INDEX_MOVIE_REVIEW_STRING), MoviesJsonUtils.separator1);
+            String[] movieReviewStringArray = MoviesJsonUtils.convertStringToArray(data.
+                    getString(INDEX_MOVIE_REVIEW_STRING), MoviesJsonUtils.separator1);
 
             mDetailAdapter.setReviewData(movieReviewStringArray);
         } else {
