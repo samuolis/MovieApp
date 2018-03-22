@@ -89,8 +89,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
         mRecyclerView.setAdapter(mMovieAdapter);
 
 
-        showLoading();
-        getSupportLoaderManager().initLoader(MOVIE_LOADER_ID, null, this);
+        if (mRecyclerView.getLayoutManager().getChildCount()==0) {
+            getSupportLoaderManager().initLoader(MOVIE_LOADER_ID, null, this);
+        }
 
         PreferenceManager.getDefaultSharedPreferences(this)
                 .registerOnSharedPreferenceChangeListener(this);
@@ -308,8 +309,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
         if (data != null) {
 
             mMovieAdapter.swapCursor(data);
-            if (mPosition == RecyclerView.NO_POSITION) mPosition = 0;
-            mRecyclerView.smoothScrollToPosition(mPosition);
             if (data.getCount() != 0) showMovieDataView();
         }
 
@@ -380,7 +379,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapterOnCli
         super.onSaveInstanceState(state);
         Log.i(LOG_TAG, "ON SAVE!!!!!!!!!!!!!!");
 
-        mListState = gridLayoutManager.onSaveInstanceState();
+        mListState = mRecyclerView.getLayoutManager().onSaveInstanceState();
         state.putParcelable(BUNDLE_RECYCLER_LAYOUT, mListState);
 
 

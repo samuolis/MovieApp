@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -58,6 +59,8 @@ public class DetailActivity extends AppCompatActivity implements
     Toolbar toolbar;
     private ImageView backdrop;
     private String backdropPath;
+    private static final String BUNDLE_RECYCLER_LAYOUT = "detailActivity.recycler.layout";
+    private Parcelable mListState;
 
     private boolean favoritePressed = false;
 
@@ -83,6 +86,7 @@ public class DetailActivity extends AppCompatActivity implements
     public static final int INDEX_MOVIE_REVIEW_STRING = 7;
     public static final int INDEX_MOVIE_BACKDROP_PATH = 8;
     private int mMovieID;
+    private LinearLayoutManager layoutManager;
 
     private Uri mMovieUrlID;
     private static final int ID_DETAIL_LOADER = 353;
@@ -140,9 +144,7 @@ public class DetailActivity extends AppCompatActivity implements
 
 
         mDetailRecyclerView = (RecyclerView) findViewById(R.id.reviews_recycler_view);
-
-        LinearLayoutManager layoutManager =
-                new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        layoutManager=new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
         mDetailRecyclerView.setLayoutManager(layoutManager);
 
@@ -400,5 +402,26 @@ public class DetailActivity extends AppCompatActivity implements
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
+    }
+
+    protected void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
+        Log.i(LOG_TAG, "ON SAVE!!!!!!!!!!!!!!");
+
+        mListState = mDetailRecyclerView.getLayoutManager().onSaveInstanceState();
+        state.putParcelable(BUNDLE_RECYCLER_LAYOUT, mListState);
+        Log.i(LOG_TAG, "STATE :" +mListState);
+
+
+    }
+
+    protected void onRestoreInstanceState(Bundle state) {
+        super.onRestoreInstanceState(state);
+        Log.i(LOG_TAG, "ON RESTORE!!!!!!!!!!!!!!");
+        if (state != null) {
+            mListState = state.getParcelable(BUNDLE_RECYCLER_LAYOUT);
+            mDetailRecyclerView.getLayoutManager().onRestoreInstanceState(mListState);
+        }
+//
     }
 }
